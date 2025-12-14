@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'trip_planner_page.dart';
+import 'translate_page.dart';
+import 'budget_page.dart';
+import 'map_page.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final VoidCallback? onSelectPlanTab;
+  final VoidCallback? onSelectTranslateTab;
+  final VoidCallback? onSelectBudgetTab;
+  final VoidCallback? onSelectMapTab;
+  const HomeScreen({super.key, this.onSelectPlanTab, this.onSelectTranslateTab, this.onSelectBudgetTab, this.onSelectMapTab});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +20,12 @@ class HomeScreen extends StatelessWidget {
         children: [
           const HeaderSection(),
           const SizedBox(height: 24),
-          const FeaturesGrid(),
+          FeaturesGrid(
+            onSelectPlanTab: onSelectPlanTab,
+            onSelectTranslateTab: onSelectTranslateTab,
+            onSelectBudgetTab: onSelectBudgetTab,
+            onSelectMapTab: onSelectMapTab,
+          ),
           const SizedBox(height: 32),
           const QuickActionSection(),
         ],
@@ -87,7 +100,11 @@ class HeaderSection extends StatelessWidget {
 }
 
 class FeaturesGrid extends StatelessWidget {
-  const FeaturesGrid({super.key});
+  final VoidCallback? onSelectPlanTab;
+  final VoidCallback? onSelectTranslateTab;
+  final VoidCallback? onSelectBudgetTab;
+  final VoidCallback? onSelectMapTab;
+  const FeaturesGrid({super.key, this.onSelectPlanTab, this.onSelectTranslateTab, this.onSelectBudgetTab, this.onSelectMapTab});
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +133,65 @@ class FeaturesGrid extends StatelessWidget {
               childAspectRatio: 1.1,
             ),
             itemCount: features.length,
-            itemBuilder: (context, index) => FeatureCard(item: features[index]),
+            itemBuilder: (context, index) {
+              final item = features[index];
+              return GestureDetector(
+                onTap: () {
+                  if (item.title == "Plan Your Trip") {
+                    // Prefer selecting the existing Plan tab if provided.
+                    if (onSelectPlanTab != null) {
+                      onSelectPlanTab!.call();
+                    } else {
+                      // Fallback to pushing a new page.
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => TripPlannerPage(
+                            onNavigateHome: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                      );
+                    }
+                  } else if (item.title == "Translate") {
+                    if (onSelectTranslateTab != null) {
+                      onSelectTranslateTab!.call();
+                    } else {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => TranslatePage(
+                            onNavigateHome: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                      );
+                    }
+                  } else if (item.title == "Budget Tracker") {
+                    if (onSelectBudgetTab != null) {
+                      onSelectBudgetTab!.call();
+                    } else {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => BudgetPage(
+                            onNavigateHome: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                      );
+                    }
+                  } else if (item.title == "Interactive Map") {
+                    if (onSelectMapTab != null) {
+                      onSelectMapTab!.call();
+                    } else {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => MapPage(
+                            onNavigateHome: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: FeatureCard(item: item),
+              );
+            },
           ),
         ],
       ),

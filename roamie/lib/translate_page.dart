@@ -1,4 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
+
+// ---------------------------------------------------------------------------
+// PAGE: TranslatePage (The main screen container)
+// ---------------------------------------------------------------------------
 
 class TranslatePage extends StatelessWidget {
   final VoidCallback onNavigateHome;
@@ -24,7 +33,7 @@ class TranslatePage extends StatelessWidget {
               style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
-              "Communicate anywhere",
+              "Communicate anywhere (Azure API)",
               style: TextStyle(color: Colors.grey[600], fontSize: 12),
             ),
           ],
@@ -39,7 +48,7 @@ class TranslatePage extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// COMPONENT: Translation Tool (Styled UI + mock translation logic)
+// COMPONENT: Translation Tool (Stateful widget with API logic)
 // ---------------------------------------------------------------------------
 
 class TranslationTool extends StatefulWidget {
@@ -54,7 +63,7 @@ class _TranslationToolState extends State<TranslationTool> {
   static const _gradientEnd = Color(0xFF7DD6E4);
   final TextEditingController _inputController = TextEditingController();
 
-  String _translatedText = "Translation will appear here (Connect translation API)";
+  String _translatedText = "Translation will appear here (Powered by Azure REST)";
   String _selectedLanguage = "Spanish";
 
   final List<String> _languages = const ["Spanish", "French", "Japanese", "German", "Korean", "Mandarin"];
@@ -64,16 +73,96 @@ class _TranslationToolState extends State<TranslationTool> {
     _inputController.dispose();
     super.dispose();
   }
+  
+  // 2. Helper function to map display name to Azure's ISO 639-1 language code
+  String _getLanguageCode(String languageName) {
+    final codeMap = {
+      "Spanish": "es", 
+      "French": "fr", 
+      "Japanese": "ja", 
+      "German": "de", 
+      "Korean": "ko",
+      "Mandarin": "zh-Hans", // Simplified Chinese
+    };
+    return codeMap[languageName] ?? "en"; // Default to English
+  }
 
-  void _handleTranslate() {
+
+  // 3. Core function to make the Azure API call via REST
+  void _handleTranslate() async {
     final input = _inputController.text.trim();
-    setState(() {
-      if (input.isEmpty) {
+    final targetCode = _getLanguageCode(_selectedLanguage);
+
+    if (input.isEmpty) {
+      setState(() {
         _translatedText = "Please enter text to translate.";
-      } else {
-        _translatedText = "Simulated $_selectedLanguage translation of: $input";
-      }
+      });
+      return;
+    }
+    
+    setState(() {
+      _translatedText = "Translating..."; // Show loading state
     });
+
+    try {
+      // 4. Load credentials securely from the .env file
+      final subscriptionKey = dotenv.env['AZURE_KEY'];
+      final subscriptionRegion = dotenv.env['AZURE_REGION'];
+      final endpoint = dotenv.env['AZURE_ENDPOINT'] ?? 'https://api.cognitive.microsofttranslator.com';
+
+      if (subscriptionKey == null || subscriptionRegion == null) {
+        setState(() {
+          _translatedText = "Missing AZURE_KEY or AZURE_REGION in .env. Please set them and restart the app.";
+        });
+        return;
+      }
+
+      final uri = Uri.parse('$endpoint/translate').replace(queryParameters: {
+        'api-version': '3.0',
+        'to': targetCode,
+        // Add 'from': 'en' to force a source language if needed
+      });
+
+      final headers = {
+        'Ocp-Apim-Subscription-Key': subscriptionKey,
+        'Ocp-Apim-Subscription-Region': subscriptionRegion,
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http
+          .post(uri, headers: headers, body: jsonEncode([
+            {'Text': input}
+          ]))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        String translatedText = "No translation returned.";
+
+        if (decoded is List && decoded.isNotEmpty) {
+          final first = decoded.first;
+          if (first is Map && first['translations'] is List && (first['translations'] as List).isNotEmpty) {
+            final firstTranslation = first['translations'][0];
+            if (firstTranslation is Map && firstTranslation['text'] is String) {
+              translatedText = firstTranslation['text'] as String;
+            }
+          }
+        }
+
+        setState(() {
+          _translatedText = translatedText;
+        });
+      } else {
+        setState(() {
+          _translatedText = "Translation failed (status ${response.statusCode}): ${response.body}";
+        });
+      }
+    } catch (e) {
+      print('Azure Translation Error: $e');
+      setState(() {
+        _translatedText = "Error translating: ${e.runtimeType}: $e\nCheck your .env setup, API key/region, and endpoint.";
+      });
+    }
   }
 
   @override
@@ -228,10 +317,10 @@ class _TranslationToolState extends State<TranslationTool> {
           spacing: 12,
           runSpacing: 12,
           children: [
-            _QuickPhraseButton(label: "Hello", onTap: () => _setPhrase("Hello")),
-            _QuickPhraseButton(label: "Thank you", onTap: () => _setPhrase("Thank you")),
-            _QuickPhraseButton(label: "Where is...?", onTap: () => _setPhrase("Where is...?")),
-            _QuickPhraseButton(label: "How much?", onTap: () => _setPhrase("How much?")),
+            _QuickPhraseButton(label: "Hello", onTap: () => _setPhraseAndTranslate("Hello")),
+            _QuickPhraseButton(label: "Thank you", onTap: () => _setPhraseAndTranslate("Thank you")),
+            _QuickPhraseButton(label: "Where is...?", onTap: () => _setPhraseAndTranslate("Where is...?")),
+            _QuickPhraseButton(label: "How much?", onTap: () => _setPhraseAndTranslate("How much?")),
           ],
         ),
       ],
@@ -257,6 +346,16 @@ class _TranslationToolState extends State<TranslationTool> {
     );
   }
 
+  // Modified function to set phrase AND trigger translation
+  void _setPhraseAndTranslate(String phrase) {
+    setState(() {
+      _inputController.text = phrase;
+    });
+    // Automatically trigger translation when a quick phrase is tapped
+    _handleTranslate(); 
+  }
+
+  // Original function kept for dropdown compatibility
   void _setPhrase(String phrase) {
     setState(() {
       _inputController.text = phrase;
