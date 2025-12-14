@@ -58,7 +58,12 @@ class _MainScreenState extends State<MainScreen> {
   Widget _getPage(int index) {
     switch (index) {
       case 0:
-        return const HomeScreen(); 
+        return HomeScreen(
+          onSelectPlanTab: () => setState(() => _selectedIndex = 1),
+          onSelectTranslateTab: () => setState(() => _selectedIndex = 2),
+          onSelectBudgetTab: () => setState(() => _selectedIndex = 3),
+          onSelectMapTab: () => setState(() => _selectedIndex = 4),
+        ); 
       case 1:
         return TripPlannerPage(    
           onNavigateHome: () => setState(() => _selectedIndex = 0),
