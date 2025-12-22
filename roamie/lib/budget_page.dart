@@ -8,6 +8,7 @@ class BudgetPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
@@ -39,7 +40,7 @@ class BudgetPage extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// COMPONENT: Budget Tracker UI (styled like the mock) + mock logic
+// COMPONENT: Budget Tracker UI + History Logic
 // ---------------------------------------------------------------------------
 
 class BudgetTracker extends StatefulWidget {
@@ -55,6 +56,7 @@ class _BudgetTrackerState extends State<BudgetTracker> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
+  // Each expense is a Map containing id, category, amount, description, and date
   final List<Map<String, dynamic>> _expenses = [];
 
   final List<Map<String, dynamic>> _categories = const [
@@ -82,16 +84,26 @@ class _BudgetTrackerState extends State<BudgetTracker> {
     final amountText = _amountController.text.trim();
     final description = _descriptionController.text.trim();
     final amount = double.tryParse(amountText) ?? 0;
+    
     if (amount <= 0) return;
 
     setState(() {
       _expenses.insert(0, {
+        'id': DateTime.now().toString(), // unique ID for deletion
         'category': _selectedCategory,
         'amount': amount,
         'description': description.isEmpty ? _selectedCategory : description,
+        'timestamp': DateTime.now(),
       });
       _amountController.clear();
       _descriptionController.clear();
+      FocusScope.of(context).unfocus(); // Close keyboard
+    });
+  }
+
+  void _removeExpense(String id) {
+    setState(() {
+      _expenses.removeWhere((item) => item['id'] == id);
     });
   }
 
@@ -104,22 +116,17 @@ class _BudgetTrackerState extends State<BudgetTracker> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 6),
         const Text(
-          "Budget Tracker",
+          "Real-time Spending",
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          "Keep track of your spending in real-time",
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 18),
         _buildOverviewCard(spentText, remainingText, progress),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
         _buildAddExpenseCard(),
+        const SizedBox(height: 24),
+        _buildHistorySection(),
       ],
     );
   }
@@ -128,51 +135,48 @@ class _BudgetTrackerState extends State<BudgetTracker> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.attach_money, color: Colors.orange, size: 20),
-              const SizedBox(width: 8),
-              const Text(
-                "Budget Overview",
+              Icon(Icons.pie_chart_outline, color: Color(0xFF00A3D7), size: 22),
+              SizedBox(width: 8),
+              Text(
+                "Budget Summary",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _statColumn("Total Budget", "\$${widget.totalBudget.toStringAsFixed(0)}", Colors.black),
-              _statColumn("Spent", "\$$spentText", Colors.deepOrange),
+              _statColumn("Budget", "\$${widget.totalBudget.toInt()}", Colors.black87),
+              _statColumn("Spent", "\$$spentText", Colors.redAccent),
               _statColumn("Remaining", "\$$remainingText", const Color(0xFF00A3D7)),
             ],
           ),
-          const SizedBox(height: 14),
-          const Text(
-            "Budget Used",
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 20),
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: progress,
-              minHeight: 10,
-              backgroundColor: Colors.grey.shade300,
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF00A3D7)),
+              minHeight: 12,
+              backgroundColor: Colors.grey.shade200,
+              valueColor: AlwaysStoppedAnimation(
+                progress > 0.9 ? Colors.red : const Color(0xFF00A3D7),
+              ),
             ),
           ),
         ],
@@ -183,13 +187,13 @@ class _BudgetTrackerState extends State<BudgetTracker> {
   Widget _statColumn(String label, String value, Color color) {
     return Column(
       children: [
-        Text(label, style: TextStyle(color: Colors.grey[700], fontSize: 13)),
-        const SizedBox(height: 6),
+        Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+        const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
             fontWeight: FontWeight.w800,
-            fontSize: 18,
+            fontSize: 16,
             color: color,
           ),
         ),
@@ -201,112 +205,193 @@ class _BudgetTrackerState extends State<BudgetTracker> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Add Expense",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            "Category",
-            style: TextStyle(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: _categories.map((cat) {
-              final selected = cat['label'] == _selectedCategory;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedCategory = cat['label'] as String),
-                child: Container(
-                  width: 110,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: selected ? Colors.deepOrange : Colors.grey.shade300, width: 1.2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(cat['icon'] as IconData, color: selected ? Colors.deepOrange : Colors.grey[700], size: 26),
-                      const SizedBox(height: 8),
-                      Text(
-                        cat['label'] as String,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: selected ? Colors.deepOrange : Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+          const Text("Add New Expense", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
-          const Text(
-            "Amount (\$)",
-            style: TextStyle(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 6),
-          TextField(
-            controller: _amountController,
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              hintText: "0.00",
-            ),
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            "Description",
-            style: TextStyle(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 6),
-          TextField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(
-              hintText: "What did you buy?",
+          const Text("Category", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: _categories.map((cat) {
+                final selected = cat['label'] == _selectedCategory;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedCategory = cat['label'] as String),
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: selected ? Colors.deepOrange.withOpacity(0.1) : Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: selected ? Colors.deepOrange : Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(cat['icon'] as IconData, size: 16, color: selected ? Colors.deepOrange : Colors.black54),
+                        const SizedBox(width: 6),
+                        Text(
+                          cat['label'] as String,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: selected ? Colors.deepOrange : Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ),
           const SizedBox(height: 18),
+          Column(
+            children: [
+              TextField(
+                controller: _amountController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  labelText: "Amount",
+                  prefixText: "\$ ",
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  labelText: "Description",
+                  hintText: "E.g. Coffee",
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
+            height: 48,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepOrange,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: _addExpense,
-              child: const Text(
-                "Add",
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
+              child: const Text("Add Expense", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHistorySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            "Expense History",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        if (_expenses.isEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey[300]),
+                const SizedBox(height: 12),
+                Text("No expenses recorded yet.", style: TextStyle(color: Colors.grey[400])),
+              ],
+            ),
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _expenses.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final expense = _expenses[index];
+              final categoryData = _categories.firstWhere(
+                (c) => c['label'] == expense['category'],
+                orElse: () => {'icon': Icons.help_outline},
+              );
+
+              return Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrange.withOpacity(0.05),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(categoryData['icon'] as IconData, color: Colors.deepOrange, size: 20),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            expense['description'],
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                          ),
+                          Text(
+                            expense['category'],
+                            style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "-\$${(expense['amount'] as double).toStringAsFixed(2)}",
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        GestureDetector(
+                          onTap: () => _removeExpense(expense['id']),
+                          child: const Text(
+                            "Delete",
+                            style: TextStyle(color: Colors.grey, fontSize: 11, decoration: TextDecoration.underline),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }
