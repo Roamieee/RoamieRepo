@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'firebase_options.dart';
 
 // --- IMPORTS ---
 import 'home_screen.dart';        
@@ -11,7 +12,9 @@ import 'map_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await dotenv.load(fileName: ".env");
   runApp(const RoamieApp());
 }
@@ -59,42 +62,42 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  // This handles switching pages
-  Widget _getPage(int index) {
-    switch (index) {
-      case 0:
-        return HomeScreen(
-          onSelectPlanTab: () => setState(() => _selectedIndex = 1),
-          onSelectTranslateTab: () => setState(() => _selectedIndex = 2),
-          onSelectBudgetTab: () => setState(() => _selectedIndex = 3),
-          onSelectMapTab: () => setState(() => _selectedIndex = 4),
-        ); 
-      case 1:
-        return TripPlannerPage(    
-          onNavigateHome: () => setState(() => _selectedIndex = 0),
-        );
-      case 2:
-        return TranslatePage(
+  // Keep single instances of each page so their state (e.g., budget history) persists
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      HomeScreen(
+        onSelectPlanTab: () => setState(() => _selectedIndex = 1),
+        onSelectTranslateTab: () => setState(() => _selectedIndex = 2),
+        onSelectBudgetTab: () => setState(() => _selectedIndex = 3),
+        onSelectMapTab: () => setState(() => _selectedIndex = 4),
+      ),
+      TripPlannerPage(
         onNavigateHome: () => setState(() => _selectedIndex = 0),
-        );
-      case 3:
-        return BudgetPage(
+      ),
+      TranslatePage(
         onNavigateHome: () => setState(() => _selectedIndex = 0),
-      );
-      case 4:
-        return MapPage(
+      ),
+      BudgetPage(
         onNavigateHome: () => setState(() => _selectedIndex = 0),
-      );
-      default:
-        return const HomeScreen();
-    }
+      ),
+      MapPage(
+        onNavigateHome: () => setState(() => _selectedIndex = 0),
+      ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // The error happened because your file was missing this line:
-      body: _getPage(_selectedIndex), 
+      // Keep pages alive so their state (e.g., budget entries) is not lost when switching tabs
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ), 
       
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
