@@ -42,6 +42,12 @@ dependencies:
   # For on-device Optical Character Recognition (OCR)
   google_mlkit_text_recognition: ^0.15.0
 
+  # For speech-to-text recognition
+  speech_to_text: ^7.0.0
+
+  # For text-to-speech (reading translations aloud)
+  flutter_tts: ^4.2.0
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
