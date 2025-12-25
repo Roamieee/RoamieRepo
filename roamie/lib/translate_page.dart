@@ -5,6 +5,8 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_tts/flutter_tts.dart';
 
 
 // ---------------------------------------------------------------------------
@@ -71,11 +73,127 @@ class _TranslationToolState extends State<TranslationTool> {
  final ImagePicker _picker = ImagePicker();
  final List<String> _languages = const ["Spanish", "French", "Japanese", "German", "Korean", "Mandarin"];
 
+ // Speech recognition state
+ stt.SpeechToText? _speech;
+ bool _isListening = false;
+ bool _speechAvailable = false;
+
+ // Text-to-speech state
+ final FlutterTts _flutterTts = FlutterTts();
+
  @override
  void dispose() {
   _inputController.dispose();
+  _flutterTts.stop();
   super.dispose();
  }
+
+ // Speak translated text using text-to-speech
+ Future<void> _speakTranslation() async {
+  if (_translatedText.isEmpty || 
+      _translatedText == "Translation will appear here (Powered by Azure REST)" ||
+      _translatedText.contains("Error") ||
+      _translatedText.contains("failed") ||
+      _translatedText.contains("Translating...")) {
+    return;
+  }
+
+  try {
+    // Set language based on selected target language
+    final languageCode = _getLanguageCode(_selectedLanguage);
+    await _flutterTts.setLanguage(languageCode);
+    await _flutterTts.setPitch(1.0);
+    await _flutterTts.setSpeechRate(0.5);
+    await _flutterTts.speak(_translatedText);
+  } catch (e) {
+    print('TTS Error: $e');
+  }
+ }
+
+  // Voice recording handler - initializes and requests permission on first use
+  Future<void> _handleVoiceRecording() async {
+    // Initialize speech recognition on first use (lazy initialization)
+    if (_speech == null || !_speechAvailable) {
+      _speech = stt.SpeechToText();
+      
+      setState(() {
+        _translatedText = "Initializing speech recognition...";
+      });
+      
+      _speechAvailable = await _speech!.initialize(
+        onError: (error) {
+          print('Speech recognition error: $error');
+          setState(() {
+            _translatedText = "Speech error: ${error.errorMsg}. Please grant microphone permission in settings.";
+            _isListening = false;
+          });
+        },
+        onStatus: (status) {
+          print('Speech recognition status: $status');
+          if (status == 'notListening' && _isListening) {
+            setState(() {
+              _isListening = false;
+            });
+          }
+        },
+      );
+      
+      if (!_speechAvailable) {
+        setState(() {
+          _translatedText = "Speech recognition not available. Please grant microphone permission.";
+        });
+        return;
+      }
+    }
+
+    if (_isListening) {
+      // Stop listening
+      await _speech!.stop();
+      setState(() {
+        _isListening = false;
+      });
+    } else {
+      // Check if speech recognition is available
+      if (!_speech!.isAvailable) {
+        setState(() {
+          _translatedText = "Speech recognition not available on this device.";
+        });
+        return;
+      }
+
+      // Start listening
+      setState(() {
+        _isListening = true;
+        _translatedText = "Listening... Speak now!";
+      });
+
+      bool started = await _speech!.listen(
+        onResult: (result) {
+          setState(() {
+            _inputController.text = result.recognizedWords;
+            if (result.finalResult) {
+              _isListening = false;
+              _translatedText = "Processing speech...";
+              // Automatically translate once speech is finalized
+              _handleTranslate();
+            }
+          });
+        },
+        listenFor: const Duration(seconds: 30),
+        pauseFor: const Duration(seconds: 3),
+        partialResults: true,
+        cancelOnError: true,
+        listenMode: stt.ListenMode.confirmation,
+      );
+
+      if (!started) {
+        setState(() {
+          _isListening = false;
+          _translatedText = "Failed to start listening. Please check microphone permissions.";
+        });
+      }
+    }
+  }
 
   // Function to show the image source options (Camera or Gallery)
   void _showImageSourcePicker() {
@@ -314,8 +432,11 @@ class _TranslationToolState extends State<TranslationTool> {
            mainAxisAlignment: MainAxisAlignment.end,
            children: [
             IconButton(
-             icon: const Icon(Icons.mic_outlined),
-             onPressed: () {},
+             icon: Icon(
+               _isListening ? Icons.mic : Icons.mic_outlined,
+               color: _isListening ? Colors.red : null,
+             ),
+             onPressed: _handleVoiceRecording,
             ),
             IconButton(
              icon: const Icon(Icons.photo_camera_outlined),
@@ -372,7 +493,7 @@ class _TranslationToolState extends State<TranslationTool> {
          const Spacer(),
          IconButton(
           icon: const Icon(Icons.volume_up_outlined),
-          onPressed: () {},
+          onPressed: _speakTranslation,
          ),
         ],
        ),
