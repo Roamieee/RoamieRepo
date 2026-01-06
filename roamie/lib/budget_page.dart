@@ -162,9 +162,9 @@ class _BudgetTrackerState extends State<BudgetTracker> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _statColumn("Budget", "\$${widget.totalBudget.toInt()}", Colors.black87),
-              _statColumn("Spent", "\$$spentText", Colors.redAccent),
-              _statColumn("Remaining", "\$$remainingText", const Color(0xFF00A3D7)),
+              _statColumn("Budget", "RM${widget.totalBudget.toInt()}", Colors.black87),
+              _statColumn("Spent", "RM$spentText", Colors.redAccent),
+              _statColumn("Remaining", "RM$remainingText", const Color(0xFF00A3D7)),
             ],
           ),
           const SizedBox(height: 20),
@@ -258,7 +258,7 @@ class _BudgetTrackerState extends State<BudgetTracker> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
                   labelText: "Amount",
-                  prefixText: "\$ ",
+                  prefixText: "RM ",
                   filled: true,
                   fillColor: Colors.grey[50],
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
@@ -369,7 +369,7 @@ class _BudgetTrackerState extends State<BudgetTracker> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "-\$${(expense['amount'] as double).toStringAsFixed(2)}",
+                          "-RM${(expense['amount'] as double).toStringAsFixed(2)}",
                           style: const TextStyle(
                             color: Colors.redAccent,
                             fontWeight: FontWeight.bold,
