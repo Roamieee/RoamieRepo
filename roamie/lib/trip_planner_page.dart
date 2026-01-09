@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'shared_budget.dart';
+import 'itinerary_screen.dart';
 
 // ---------------------------------------------------------------------------
 // TRIP PLANNER PAGE
@@ -25,11 +26,23 @@ class _TripPlannerPageState extends State<TripPlannerPage> {
   };
 
   void _handlePlanTrip(Map<String, dynamic> details) {
-    setState(() {
-      _tripDetails = details;
-      _showItinerary = true;
-    });
-  }
+      // 1. Extract the data from the form map
+      String destination = details['destination'] ?? "Unknown City";
+      String budget = details['budget'] ?? "0";
+      String dates = "${details['dates']['start']} to ${details['dates']['end']}";
+
+      // 2. Navigate to the Itinerary Screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ItineraryScreen(
+            destination: destination,
+            budget: budget,
+            dateRange: dates,
+          ),
+        ),
+      );
+    }
 
   @override
   Widget build(BuildContext context) {
