@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // --- DATA MODELS ---
-// We use an abstract class so our list can hold BOTH Headers and Activities
 abstract class ItineraryItem {}
 
 class DayHeader extends ItineraryItem {
@@ -39,7 +38,6 @@ class EditItineraryScreen extends StatefulWidget {
 }
 
 class _EditItineraryScreenState extends State<EditItineraryScreen> {
-  // This list now holds mixed items (Headers AND Activities)
   List<ItineraryItem> _items = [];
   bool _isSaving = false;
   
@@ -59,18 +57,14 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
       String cleanLine = line.trim();
       if (cleanLine.isEmpty) continue;
 
-      // 1. DETECT DAY HEADER
       if (cleanLine.startsWith("Day")) {
-        // Clean up text (e.g. "Day 1:" -> "Day 1")
         String title = cleanLine.replaceAll(":", "").trim();
         _items.add(DayHeader(title));
         hasFoundDay = true;
         continue;
       }
 
-      // 2. DETECT ACTIVITY
       if (cleanLine.contains("-")) {
-        // Try to split "09:00 AM - Activity Name (Location)"
         var parts = cleanLine.split("-");
         String time = parts[0].trim();
         String rest = parts.sublist(1).join("-").trim();
@@ -89,7 +83,6 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
       }
     }
     
-    // Fallback: If AI didn't write "Day 1", insert it at the top
     if (!hasFoundDay && _items.isNotEmpty) {
       _items.insert(0, DayHeader("Day 1"));
     }
@@ -122,13 +115,11 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
     }
   }
 
-  // Reconstruct the text with Days included
   String _generateFinalString() {
     StringBuffer buffer = StringBuffer();
-    
     for (var item in _items) {
       if (item is DayHeader) {
-        buffer.writeln("\n${item.title}:"); // Add empty line before days
+        buffer.writeln("\n${item.title}:"); 
       } else if (item is EditableActivity) {
         buffer.writeln("${item.time} - ${item.titleController.text} (${item.locationController.text})");
       }
@@ -161,6 +152,17 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
     }
   }
 
+  // --- NEW: REORDER LOGIC ---
+  void _onReorder(int oldIndex, int newIndex) {
+    setState(() {
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
+      }
+      final ItineraryItem item = _items.removeAt(oldIndex);
+      _items.insert(newIndex, item);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,32 +187,47 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
       ),
       body: Column(
         children: [
+          // Header Hint
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             color: _accentColor.withOpacity(0.1),
             width: double.infinity,
             child: Row(
               children: [
-                Icon(Icons.auto_fix_high, color: _accentColor, size: 20),
+                Icon(Icons.touch_app, color: _accentColor, size: 20),
                 const SizedBox(width: 10),
-                const Expanded(child: Text("Tap items to edit. Drag to reorder (coming soon).", style: TextStyle(fontSize: 12))),
+                // UPDATED TEXT
+                const Expanded(child: Text("Drag to reorder items. Tap to edit text.", style: TextStyle(fontSize: 12))),
               ],
             ),
           ),
           
           Expanded(
-            child: ListView.builder(
+            // --- UPDATED: ReorderableListView ---
+            child: ReorderableListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: _items.length,
+              onReorder: _onReorder,
+              buildDefaultDragHandles: false,
+              // Improves the look when dragging
+              proxyDecorator: (child, index, animation) {
+                return Material(
+                  elevation: 5,
+                  color: Colors.transparent,
+                  shadowColor: Colors.black26,
+                  child: child,
+                );
+              },
               itemBuilder: (context, index) {
                 final item = _items[index];
 
                 // --- CASE 1: DAY HEADER ---
                 if (item is DayHeader) {
-                  return Padding(
+                  return Container(
+                    key: ObjectKey(item), // KEY IS REQUIRED FOR REORDERING
                     padding: const EdgeInsets.only(top: 20, bottom: 10, left: 5),
                     child: Text(
-                      item.title, // e.g. "Day 1"
+                      item.title, 
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                     ),
                   );
@@ -219,7 +236,8 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
                 // --- CASE 2: EDITABLE CARD ---
                 if (item is EditableActivity) {
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 12), // Spacing between cards
+                    key: ObjectKey(item), // KEY IS REQUIRED FOR REORDERING
+                    margin: const EdgeInsets.only(bottom: 12), 
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -231,6 +249,13 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
                       children: [
                         Row(
                           children: [
+                            ReorderableDragStartListener(
+                              index: index,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: Icon(Icons.drag_indicator, color: Colors.grey[400]),
+                              ),
+                            ),
                             InkWell(
                               onTap: () => _pickTime(item),
                               borderRadius: BorderRadius.circular(8),
@@ -251,6 +276,7 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
                               ),
                             ),
                             const Spacer(),
+                            // Delete Button
                             InkWell(
                               onTap: () => setState(() => _items.removeAt(index)),
                               child: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
@@ -271,7 +297,7 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
                     ),
                   );
                 }
-                return const SizedBox.shrink();
+                return SizedBox.shrink(key: ObjectKey(item));
               },
             ),
           ),
@@ -281,7 +307,6 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            // Find where to add: defaults to end
             _items.add(EditableActivity(time: "12:00 PM", title: "", location: ""));
           });
         },
