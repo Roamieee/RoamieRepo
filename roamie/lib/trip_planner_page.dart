@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'shared_budget.dart';
 import 'itinerary_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // ---------------------------------------------------------------------------
 // TRIP PLANNER PAGE
@@ -25,24 +26,66 @@ class _TripPlannerPageState extends State<TripPlannerPage> {
     'interests': <String>[],
   };
 
-  void _handlePlanTrip(Map<String, dynamic> details) {
-      // 1. Extract the data from the form map
-      String destination = details['destination'] ?? "Unknown City";
-      String budget = details['budget'] ?? "0";
-      String dates = "${details['dates']['start']} to ${details['dates']['end']}";
-
-      // 2. Navigate to the Itinerary Screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ItineraryScreen(
-            destination: destination,
-            budget: budget,
-            dateRange: dates,
-          ),
+  void _handlePlanTrip(Map<String, dynamic> details) async {
+    // 1. Show Loading Spinner
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (c) => const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: Color(0xFFE65B3E)),
+            SizedBox(height: 20),
+            Text("Roamie is planning your trip...", style: TextStyle(color: Colors.white, decoration: TextDecoration.none, fontSize: 14))
+          ],
         ),
-      );
+      ),
+    );
+
+    try {
+      // 2. Send Request to Firebase "itinerary_requests"
+      // This is the mailbox your Python script is watching!
+      DocumentReference ref = await FirebaseFirestore.instance.collection('itinerary_requests').add({
+        'destination': details['destination'],
+        'budget': details['budget'],
+        'interests': details['interests'].join(", "),
+        'days': "2", // Default to 2 days for now
+        'status': 'pending',
+        'response': '', 
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // 3. Listen for the Answer (Real-time!)
+      ref.snapshots().listen((snapshot) {
+        if (snapshot.exists) {
+          Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+          
+          // If Python has finished generating...
+          if (data['status'] == 'completed') {
+            Navigator.pop(context); // Close loading spinner
+            
+            // 4. Go to Itinerary Screen with REAL AI DATA
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ItineraryScreen(
+                  destination: details['destination'],
+                  budget: details['budget'],
+                  dateRange: "${details['dates']['start']} - ${details['dates']['end']}",
+                  aiResponse: data['response'], // <--- PASS THE AI TEXT HERE
+                ),
+              ),
+            );
+          }
+        }
+      });
+      
+    } catch (e) {
+      Navigator.pop(context); // Close spinner on error
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
+  }
 
   @override
   Widget build(BuildContext context) {

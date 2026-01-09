@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'edit_itinerary_screen.dart'; 
 
-
 // --- DATA MODELS ---
-// We need these classes to track which items are checked/selected
 class Activity {
   String time;
   String title;
@@ -21,7 +19,7 @@ class Activity {
 }
 
 class DaySchedule {
-  String dayTitle; // e.g., "Day 1"
+  String dayTitle; 
   List<Activity> activities;
 
   DaySchedule({required this.dayTitle, required this.activities});
@@ -29,79 +27,120 @@ class DaySchedule {
 
 // --- MAIN SCREEN ---
 class ItineraryScreen extends StatefulWidget {
-    // 1. Add these variables to hold data from the previous screen
-    final String destination;
-    final String budget;
-    final String dateRange;
+  final String destination;
+  final String budget;
+  final String dateRange;
+  
+  // --- NEW: This was missing! ---
+  final String? aiResponse; 
 
-    const ItineraryScreen({
-        Key? key,
-        required this.destination,
-        required this.budget,
-        required this.dateRange,
-    }) : super(key: key);
+  const ItineraryScreen({
+    Key? key,
+    required this.destination,
+    required this.budget,
+    required this.dateRange,
+    this.aiResponse, // <--- Now it accepts the data
+  }) : super(key: key);
 
-    @override
-    _ItineraryScreenState createState() => _ItineraryScreenState();
+  @override
+  _ItineraryScreenState createState() => _ItineraryScreenState();
 }
 
 class _ItineraryScreenState extends State<ItineraryScreen> {
+  List<DaySchedule> schedule = [];
 
-    // HELPER: Converts your nice GUI list back to a Text Block for editing
-    String _convertScheduleToString() {
-    StringBuffer buffer = StringBuffer();
-    
-    for (var day in schedule) {
-      buffer.writeln("${day.dayTitle}:"); // e.g. "Day 1:"
-      for (var activity in day.activities) {
-        // Format: 09:00 AM - Visit Temple (Location)
-        buffer.writeln("${activity.time} - ${activity.title} (${activity.location})");
-      }
-      buffer.writeln(""); // Empty line between days
+  @override
+  void initState() {
+    super.initState();
+    // Check if we have real AI data or need dummy data
+    if (widget.aiResponse != null && widget.aiResponse!.isNotEmpty) {
+      _parseAiResponse(widget.aiResponse!);
+    } else {
+      _loadDummyData();
     }
-    
+  }
+
+  // --- PARSER: Turns AI Text into List Objects ---
+  void _parseAiResponse(String response) {
+    try {
+      List<DaySchedule> parsedSchedule = [];
+      List<String> days = response.split(RegExp(r"Day \d+:"));
+      
+      if (days.isNotEmpty && days[0].trim().isEmpty) days.removeAt(0);
+
+      int dayCount = 1;
+      for (String dayText in days) {
+        List<Activity> activities = [];
+        List<String> lines = dayText.split('\n');
+        
+        for (String line in lines) {
+          if (line.trim().isEmpty) continue;
+          if (line.contains("-") || line.contains(":")) {
+             activities.add(Activity(
+               time: "Flexible", 
+               title: line.replaceAll(RegExp(r"^\d+\.\s*"), "").trim(), 
+               location: widget.destination, 
+               cost: "-"
+             ));
+          }
+        }
+        
+        if (activities.isNotEmpty) {
+          parsedSchedule.add(DaySchedule(dayTitle: "Day $dayCount", activities: activities));
+          dayCount++;
+        }
+      }
+
+      setState(() {
+        schedule = parsedSchedule;
+      });
+      
+    } catch (e) {
+      print("Error parsing AI: $e");
+      _loadDummyData();
+    }
+  }
+
+  void _loadDummyData() {
+    schedule = [
+      DaySchedule(
+        dayTitle: "Day 1 (Demo)",
+        activities: [
+          Activity(time: "09:00 AM", title: "Arrival", location: widget.destination, cost: "-"),
+          Activity(time: "12:00 PM", title: "Lunch", location: "City Center", cost: "\$10"),
+        ],
+      ),
+    ];
+  }
+
+  // HELPER: Converts list to text for editing
+  String _convertScheduleToString() {
+    if (widget.aiResponse != null) return widget.aiResponse!;
+
+    StringBuffer buffer = StringBuffer();
+    for (var day in schedule) {
+      buffer.writeln("${day.dayTitle}:"); 
+      for (var activity in day.activities) {
+        buffer.writeln("${activity.time} - ${activity.title}");
+      }
+      buffer.writeln(""); 
+    }
     return buffer.toString();
   }
 
-  // DUMMY DATA (This is what your AI will eventually parse into)
-  List<DaySchedule> schedule = [
-    DaySchedule(
-      dayTitle: "Day 1",
-      activities: [
-        Activity(time: "09:00 AM", title: "Georgetown Heritage Walk", location: "George Town, Penang", cost: "\$5"),
-        Activity(time: "12:00 PM", title: "Lunch at Local Hawker Center", location: "Gurney Drive", cost: "\$8"),
-        Activity(time: "02:00 PM", title: "Penang Hill Cable Car", location: "Penang Hill", cost: "\$15"),
-      ],
-    ),
-    DaySchedule(
-      dayTitle: "Day 2",
-      activities: [
-        Activity(time: "08:00 AM", title: "Visit Kek Lok Si Temple", location: "Air Itam", cost: "\$3"),
-        Activity(time: "11:00 AM", title: "Explore Street Art", location: "Armenian Street", cost: "Free"),
-      ],
-    ),
-  ];
-
-  // LOGIC: Delete items that are checked
   void _deleteSelectedItems() {
     setState(() {
       for (var day in schedule) {
         day.activities.removeWhere((item) => item.isSelected);
       }
-      // Optional: Remove empty days if you want
-      // schedule.removeWhere((day) => day.activities.isEmpty);
     });
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Selected items deleted")),
-    );
   }
 
-  // LOGIC: Add a new dummy item (You can make a dialog for this later)
   void _addNewItem() {
+    if (schedule.isEmpty) return;
     setState(() {
       schedule[0].activities.add(
-        Activity(time: "04:00 PM", title: "New Activity Added", location: "User Location", cost: "\$10"),
+        Activity(time: "TBD", title: "New Activity", location: "-", cost: "-"),
       );
     });
   }
@@ -109,41 +148,39 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Light grey background like image
+      backgroundColor: Colors.grey[100], 
       appBar: AppBar(
         title: const Text("Trip Planner", style: TextStyle(color: Colors.black, fontSize: 18)),
         backgroundColor: Colors.white,
         elevation: 0,
+        
+        // Back Button
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
+
         actions: [
-            // 1. NEW EDIT BUTTON
+          // Edit Button
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.teal),
-            tooltip: "Fix Mistakes & Train AI",
+            tooltip: "Edit & Train",
             onPressed: () {
-              // Convert current list to string
-              String currentText = _convertScheduleToString();
-              
-              // Navigate to the Edit Screen
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => EditItineraryScreen(
                     city: widget.destination,
-                    originalItinerary: currentText,
+                    originalItinerary: _convertScheduleToString(),
                   ),
                 ),
               );
             },
           ),
-          // Show Delete button only if items are selected
+          // Delete Button
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.red),
             onPressed: _deleteSelectedItems,
-            tooltip: "Delete Selected",
           ) 
         ],
       ),
@@ -152,13 +189,13 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // 1. THE ORANGE HEADER CARD
+              // Header Card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFE88A60), Color(0xFFF4A261)], // Orange gradient
+                    colors: [Color(0xFFE88A60), Color(0xFFF4A261)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -169,17 +206,17 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                   children: [
                     Text(
                       "Your ${widget.destination} Adventure",
-                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
-                        Icon(Icons.access_time, color: Colors.white70, size: 16),
-                        SizedBox(width: 5),
-                        Text("2026-01-21 to 2026-01-23", style: TextStyle(color: Colors.white, fontSize: 14)),
-                        SizedBox(width: 20),
-                        Icon(Icons.attach_money, color: Colors.white70, size: 16),
-                        Text("Budget: \$590", style: TextStyle(color: Colors.white, fontSize: 14)),
+                        const Icon(Icons.calendar_month, color: Colors.white70, size: 16),
+                        const SizedBox(width: 5),
+                        Text(widget.dateRange, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                        const SizedBox(width: 20),
+                        const Icon(Icons.attach_money, color: Colors.white70, size: 16),
+                        Text("Budget: \$${widget.budget}", style: const TextStyle(color: Colors.white, fontSize: 14)),
                       ],
                     ),
                   ],
@@ -188,16 +225,21 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               
               const SizedBox(height: 20),
 
-              // 2. THE LIST OF DAYS
-              ...schedule.map((day) => _buildDayCard(day)).toList(),
+              // List of Activities
+              if (schedule.isEmpty) 
+                const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text("No itinerary generated yet."),
+                )
+              else 
+                ...schedule.map((day) => _buildDayCard(day)).toList(),
               
-              const SizedBox(height: 80), // Space for FAB
+              const SizedBox(height: 80), 
             ],
           ),
         ),
       ),
       
-      // 3. ADD BUTTON
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _addNewItem,
         label: const Text("Add Place"),
@@ -207,7 +249,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     );
   }
 
-  // WIDGET: Builds the White Card for each Day
   Widget _buildDayCard(DaySchedule day) {
     return Card(
       margin: const EdgeInsets.only(bottom: 20),
@@ -223,7 +264,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            // Build list of activities inside this day
             ...day.activities.map((activity) => _buildActivityTile(activity)).toList(),
           ],
         ),
@@ -231,7 +271,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     );
   }
 
-  // WIDGET: The individual row (Time - Title - Checkbox)
   Widget _buildActivityTile(Activity activity) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
@@ -243,7 +282,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Time Column
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
@@ -255,10 +293,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               style: TextStyle(color: Colors.orange.shade800, fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ),
-          
           const SizedBox(width: 12),
-          
-          // Details Column
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,18 +308,15 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                     const Icon(Icons.location_on, size: 12, color: Colors.grey),
                     const SizedBox(width: 4),
                     Expanded(child: Text(activity.location, style: const TextStyle(color: Colors.grey, fontSize: 12), overflow: TextOverflow.ellipsis)),
-                    Text(activity.cost, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
               ],
             ),
           ),
-
-          // Checkbox logic
           Checkbox(
             value: activity.isSelected,
             activeColor: Colors.orange,
-            shape: const CircleBorder(), // Makes it round like the image
+            shape: const CircleBorder(),
             onChanged: (bool? value) {
               setState(() {
                 activity.isSelected = value!;
