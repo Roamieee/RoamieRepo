@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'shared_budget.dart';
 
 // ---------------------------------------------------------------------------
 // TRIP PLANNER PAGE
@@ -223,7 +224,7 @@ class _TripPlannerFormState extends State<TripPlannerForm> {
                 onTap: () => _pickDate(isStart: false),
               ),
               const SizedBox(height: 16),
-              _buildLabel("Budget (USD)", icon: Icons.attach_money),
+              _buildLabel("Budget (RM)", icon: Icons.attach_money),
               const SizedBox(height: 6),
               TextField(
                 controller: _budgetController,
@@ -232,6 +233,15 @@ class _TripPlannerFormState extends State<TripPlannerForm> {
                   hintText: "Enter your budget",
                   prefixIcon: Icon(Icons.account_balance_wallet_outlined),
                 ),
+                onChanged: (value) {
+                  // Update SharedBudget in real-time as user types
+                  final amount = double.tryParse(value.trim());
+                  if (amount != null && amount > 0) {
+                    SharedBudget.budget = amount;
+                  } else {
+                    SharedBudget.budget = 0.0;
+                  }
+                },
               ),
               const SizedBox(height: 18),
               _buildLabel("Interests", icon: Icons.favorite_border),

@@ -1,9 +1,35 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'shared_budget.dart';
 
-class BudgetPage extends StatelessWidget {
+class BudgetPage extends StatefulWidget {
   final VoidCallback onNavigateHome;
 
   const BudgetPage({super.key, required this.onNavigateHome});
+
+  @override
+  State<BudgetPage> createState() => _BudgetPageState();
+}
+
+class _BudgetPageState extends State<BudgetPage> {
+  late Timer _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Rebuild every 500ms to reflect budget changes from trip planner
+    _refreshTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +41,7 @@ class BudgetPage extends StatelessWidget {
         centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: onNavigateHome,
+          onPressed: widget.onNavigateHome,
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,9 +57,9 @@ class BudgetPage extends StatelessWidget {
           ],
         ),
       ),
-      body: const SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        child: BudgetTracker(totalBudget: 1000.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: BudgetTracker(totalBudget: SharedBudget.budget),
       ),
     );
   }
