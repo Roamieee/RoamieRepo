@@ -114,7 +114,10 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
         title: const Text("Trip Planner", style: TextStyle(color: Colors.black, fontSize: 18)),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const Icon(Icons.arrow_back, color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
             // 1. NEW EDIT BUTTON
           IconButton(
@@ -129,7 +132,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => EditItineraryScreen(
-                    city: "Penang", // You can make this dynamic later
+                    city: widget.destination,
                     originalItinerary: currentText,
                   ),
                 ),

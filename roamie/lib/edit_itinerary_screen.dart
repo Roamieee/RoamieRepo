@@ -77,9 +77,18 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text("Edit ${widget.city} Plan"),
+        title: Text("Edit ${widget.city} Plan",
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.teal,
         elevation: 0,
+        // We explicitly add a back button that closes the screen
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context); // This creates the "Back" action
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
