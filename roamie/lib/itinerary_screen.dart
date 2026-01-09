@@ -7,14 +7,12 @@ class Activity {
   String title;
   String location;
   String cost;
-  bool isSelected;
 
   Activity({
     required this.time,
     required this.title,
     required this.location,
     required this.cost,
-    this.isSelected = false,
   });
 }
 
@@ -48,6 +46,9 @@ class ItineraryScreen extends StatefulWidget {
 
 class _ItineraryScreenState extends State<ItineraryScreen> {
   List<DaySchedule> schedule = [];
+
+  // Define your app's theme orange
+  final Color _themeOrange = const Color(0xFFE65B3E);
 
   @override
   void initState() {
@@ -128,14 +129,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     return buffer.toString();
   }
 
-  void _deleteSelectedItems() {
-    setState(() {
-      for (var day in schedule) {
-        day.activities.removeWhere((item) => item.isSelected);
-      }
-    });
-  }
-
   void _addNewItem() {
     if (schedule.isEmpty) return;
     setState(() {
@@ -163,7 +156,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
         actions: [
           // Edit Button
           IconButton(
-            icon: const Icon(Icons.edit, color: Colors.teal),
+            icon: Icon(Icons.edit, color: _themeOrange),
             tooltip: "Edit & Train",
             onPressed: () {
               Navigator.push(
@@ -177,11 +170,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               );
             },
           ),
-          // Delete Button
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: _deleteSelectedItems,
-          ) 
         ],
       ),
       body: SingleChildScrollView(
@@ -238,13 +226,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             ],
           ),
         ),
-      ),
-      
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _addNewItem,
-        label: const Text("Add Place"),
-        icon: const Icon(Icons.add),
-        backgroundColor: const Color(0xFFE88A60),
       ),
     );
   }
@@ -313,16 +294,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               ],
             ),
           ),
-          Checkbox(
-            value: activity.isSelected,
-            activeColor: Colors.orange,
-            shape: const CircleBorder(),
-            onChanged: (bool? value) {
-              setState(() {
-                activity.isSelected = value!;
-              });
-            },
-          )
         ],
       ),
     );
