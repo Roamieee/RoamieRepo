@@ -27,6 +27,28 @@ class _TripPlannerPageState extends State<TripPlannerPage> {
   };
 
   void _handlePlanTrip(Map<String, dynamic> details) async {
+    // --- 1. CALCULATE DAYS DYNAMICALLY ---
+    int numDays = 2; // Default fallback
+    try {
+      String startStr = details['dates']['start']; // Format: "dd/mm/yyyy"
+      String endStr = details['dates']['end'];
+
+      if (startStr.isNotEmpty && endStr.isNotEmpty) {
+        // Parse "dd/mm/yyyy" into DateTime
+        List<String> startParts = startStr.split('/');
+        List<String> endParts = endStr.split('/');
+
+        // DateTime(year, month, day)
+        DateTime start = DateTime(int.parse(startParts[2]), int.parse(startParts[1]), int.parse(startParts[0]));
+        DateTime end = DateTime(int.parse(endParts[2]), int.parse(endParts[1]), int.parse(endParts[0]));
+
+        // Calculate difference (add 1 to include the starting day)
+        numDays = end.difference(start).inDays + 1;
+      }
+    } catch (e) {
+      print("Date Calculation Error: $e");
+    }
+    // --------------------------------------
     // 1. Show Loading Spinner
     showDialog(
       context: context,
@@ -50,7 +72,7 @@ class _TripPlannerPageState extends State<TripPlannerPage> {
         'destination': details['destination'],
         'budget': details['budget'],
         'interests': details['interests'].join(", "),
-        'days': "2", // Default to 2 days for now
+        'days': numDays.toString(), // Default to 2 days for now
         'status': 'pending',
         'response': '', 
         'timestamp': FieldValue.serverTimestamp(),
