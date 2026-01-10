@@ -49,5 +49,11 @@
 	<string>This app needs access to speech recognition to translate your voice.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to the microphone for voice translation.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to your location to show hotspots and gems nearby on the map.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to your location to track destinations even in the background.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We use your location to help you find hidden gems and provide navigation.</string>
 </dict>
 </plist>
