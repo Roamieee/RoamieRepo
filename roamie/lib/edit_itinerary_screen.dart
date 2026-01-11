@@ -291,7 +291,7 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
                         const SizedBox(height: 10),
                         TextField(
                           controller: item.locationController,
-                          decoration: const InputDecoration(labelText: "Location", prefixIcon: Icon(Icons.location_on_outlined, size: 18), isDense: true, border: OutlineInputBorder(), contentPadding: EdgeInsets.all(12)),
+                          decoration: const InputDecoration(labelText: "Interest", prefixIcon: Icon(Icons.location_on_outlined, size: 18), isDense: true, border: OutlineInputBorder(), contentPadding: EdgeInsets.all(12)),
                         ),
                       ],
                     ),
