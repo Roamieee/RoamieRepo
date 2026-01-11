@@ -112,12 +112,23 @@ class _TranslationToolState extends State<TranslationTool> {
     }
 
     try {
-      // Set language based on selected target language
-      final languageCode = _getLanguageCode(_selectedLanguage);
-      await _flutterTts.setLanguage(languageCode);
+      // Use the full locale (e.g., 'ja_JP') for better TTS compatibility
+      final locale = _getLocaleForSpeech(_selectedLanguage);
+      print('TTS: Setting language to $locale');
+
+      await _flutterTts.setLanguage(locale);
       await _flutterTts.setPitch(1.0);
       await _flutterTts.setSpeechRate(0.5);
-      await _flutterTts.speak(_translatedText);
+      await _flutterTts.setVolume(1.0); // Force max volume
+
+      print('TTS: Speaking "$_translatedText"');
+      var result = await _flutterTts.speak(_translatedText);
+      
+      if (result == 1) {
+        print("TTS: Speak command accepted");
+      } else {
+        print("TTS: Speak command failed");
+      }
     } catch (e) {
       print('TTS Error: $e');
     }
