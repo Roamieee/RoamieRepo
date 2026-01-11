@@ -143,7 +143,7 @@ class _EditItineraryScreenState extends State<EditItineraryScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("✅ Corrections sent! The AI will learn from this."), backgroundColor: Colors.green),
       );
-      Navigator.pop(context); 
+      Navigator.pop(context, finalOutput); 
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("❌ Error: $e")));

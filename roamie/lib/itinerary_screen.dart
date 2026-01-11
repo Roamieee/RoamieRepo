@@ -43,12 +43,15 @@ class ItineraryScreen extends StatefulWidget {
 }
 
 class _ItineraryScreenState extends State<ItineraryScreen> {
+  String? _currentRawItinerary;
   List<DaySchedule> schedule = [];
   final Color _themeOrange = const Color(0xFFE65B3E);
 
   @override
   void initState() {
     super.initState();
+    _currentRawItinerary = widget.aiResponse;
+
     if (widget.aiResponse != null && widget.aiResponse!.isNotEmpty) {
       _parseAiResponse(widget.aiResponse!);
     } else {
@@ -58,6 +61,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
   // --- 🛠️ THE FIX: SMART BLOCK PARSER ---
   void _parseAiResponse(String response) {
+    _currentRawItinerary = response;
     try {
       List<DaySchedule> parsedSchedule = [];
       
@@ -151,8 +155,8 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   }
 
   String _convertScheduleToString() {
-    if (widget.aiResponse != null) return widget.aiResponse!;
-    return ""; 
+    // Return the updated variable, fallback to widget, then empty
+    return _currentRawItinerary ?? widget.aiResponse ?? "";
   }
 
   @override
@@ -170,16 +174,27 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.edit, color: _themeOrange),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              // 2. Add 'await' and capture the result
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => EditItineraryScreen(
                     city: widget.destination,
-                    originalItinerary: _convertScheduleToString(),
+                    // Use the current state, not just the widget's initial response
+                    originalItinerary: _convertScheduleToString(), 
                   ),
                 ),
               );
+
+              // 3. Check if we got data back
+              if (result != null && result is String) {
+                print("Received updated itinerary!"); // Debug print
+                
+                // 4. Update the UI
+                // We explicitly call your parser with the NEW string
+                _parseAiResponse(result);
+              }
             },
           ),
         ],
