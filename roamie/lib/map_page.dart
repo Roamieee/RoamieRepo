@@ -69,14 +69,44 @@ class _MapViewState extends State<_MapView> {
   }
 
   Future<void> _initLocation() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // Test if location services are enabled.
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    // Location services are not enabled, don't continue
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // Permissions are denied, next time you could try requesting permissions again 
+      // or show a UI message to the user.
+      return Future.error('Location permissions are denied');
+    }
+  }
+  
+  if (permission == LocationPermission.deniedForever) {
+    // Permissions are denied forever, handle appropriately. 
+    return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+  } 
+
+  // When we reach here, permissions are granted and we can
+  // continue accessing the position of the device.
+  try {
     Position position = await Geolocator.getCurrentPosition();
     LatLng pos = LatLng(position.latitude, position.longitude);
     if (mounted) {
       setState(() => _currentPosition = pos);
       _fetchPlaces(pos);
     }
+  } catch (e) {
+    debugPrint("Error getting location: $e");
   }
-
+}
   // --- SEARCH SUGGESTIONS LOGIC ---
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
     if (query.isEmpty) return [];
@@ -304,38 +334,79 @@ class _MapViewState extends State<_MapView> {
     );
   }
 
-  Future<void> _fetchPlaces(LatLng pos) async {
-    final String apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? "";
-    final url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${pos.latitude},${pos.longitude}&radius=5000&type=tourist_attraction&key=$apiKey';
+Future<void> _fetchPlaces(LatLng pos) async {
+  final String apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? "";
+  
+  // 1. Increased radius to 10000 (10km)
+  // 2. We keep tourist_attraction but you could also add 'point_of_interest'
+  final url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+      'location=${pos.latitude},${pos.longitude}'
+      '&radius=10000' 
+      '&type=tourist_attraction'
+      '&key=$apiKey';
+  
+  final response = await http.get(Uri.parse(url));
+  
+  if (response.statusCode == 200) {
+    final List results = json.decode(response.body)['results'];
     
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final List results = json.decode(response.body)['results'];
-      _allPlacesData = results.where((p) => (p['rating'] ?? 0) >= 4.0).cast<Map<String, dynamic>>().toList();
-      _applyFilter(_activeFilter);
-    }
-  }
+    // Filter for places with rating >= 4.0
+    List<Map<String, dynamic>> filteredPlaces = results
+        .where((p) => (p['rating'] ?? 0) >= 4.0)
+        .cast<Map<String, dynamic>>()
+        .toList();
 
-  void _applyFilter(String filter) {
+    // SORT BY DISTANCE: The API gives results in a semi-random order.
+    // We calculate the linear distance from your current position to the place.
+    filteredPlaces.sort((a, b) {
+      double distA = Geolocator.distanceBetween(
+        pos.latitude, pos.longitude,
+        a['geometry']['location']['lat'], a['geometry']['location']['lng']
+      );
+      double distB = Geolocator.distanceBetween(
+        pos.latitude, pos.longitude,
+        b['geometry']['location']['lat'], b['geometry']['location']['lng']
+      );
+      return distA.compareTo(distB);
+    });
+
     setState(() {
-      _activeFilter = filter;
-      Set<Marker> newMarkers = {};
-      for (var p in _allPlacesData) {
-        double rating = (p['rating'] ?? 0).toDouble();
-        bool isHotspot = rating >= 4.5;
-        String category = isHotspot ? 'hotspot' : 'gem';
-        if (filter == 'all' || filter == category) {
-          newMarkers.add(Marker(
-            markerId: MarkerId(p['place_id']),
-            position: LatLng(p['geometry']['location']['lat'], p['geometry']['location']['lng']),
-            icon: BitmapDescriptor.defaultMarkerWithHue(isHotspot ? BitmapDescriptor.hueOrange : BitmapDescriptor.hueCyan),
-            onTap: () => _showDetail(p, isHotspot),
-          ));
-        }
-      }
-      _displayedMarkers = newMarkers;
+      _allPlacesData = filteredPlaces;
+      _applyFilter(_activeFilter);
     });
   }
+}
+
+void _applyFilter(String filter) {
+  setState(() {
+    _activeFilter = filter;
+    Set<Marker> newMarkers = {};
+    
+    for (var p in _allPlacesData) {
+      double rating = (p['rating'] ?? 0).toDouble();
+      int userRatingsTotal = p['user_ratings_total'] ?? 0;
+      
+      // LOGIC: 
+      // Hotspot = Rating > 4.4 AND many reviews (popular)
+      // Hidden Gem = Rating > 4.2 AND fewer reviews (quiet quality)
+      bool isHotspot = rating >= 4.5 || userRatingsTotal > 500;
+      
+      String category = isHotspot ? 'hotspot' : 'gem';
+      
+      if (filter == 'all' || filter == category) {
+        newMarkers.add(Marker(
+          markerId: MarkerId(p['place_id']),
+          position: LatLng(p['geometry']['location']['lat'], p['geometry']['location']['lng']),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            isHotspot ? BitmapDescriptor.hueOrange : BitmapDescriptor.hueCyan
+          ),
+          onTap: () => _showDetail(p, isHotspot),
+        ));
+      }
+    }
+    _displayedMarkers = newMarkers;
+  });
+}
 
   void _showDetail(dynamic p, bool isHotspot) {
     String selectedMode = 'd'; // Default: driving
