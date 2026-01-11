@@ -69,14 +69,44 @@ class _MapViewState extends State<_MapView> {
   }
 
   Future<void> _initLocation() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // Test if location services are enabled.
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    // Location services are not enabled, don't continue
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // Permissions are denied, next time you could try requesting permissions again 
+      // or show a UI message to the user.
+      return Future.error('Location permissions are denied');
+    }
+  }
+  
+  if (permission == LocationPermission.deniedForever) {
+    // Permissions are denied forever, handle appropriately. 
+    return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+  } 
+
+  // When we reach here, permissions are granted and we can
+  // continue accessing the position of the device.
+  try {
     Position position = await Geolocator.getCurrentPosition();
     LatLng pos = LatLng(position.latitude, position.longitude);
     if (mounted) {
       setState(() => _currentPosition = pos);
       _fetchPlaces(pos);
     }
+  } catch (e) {
+    debugPrint("Error getting location: $e");
   }
-
+}
   // --- SEARCH SUGGESTIONS LOGIC ---
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
     if (query.isEmpty) return [];
