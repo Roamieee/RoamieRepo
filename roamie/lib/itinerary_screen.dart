@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'edit_itinerary_screen.dart'; 
+import 'edit_itinerary_screen.dart';
 
 // --- DATA MODELS ---
 class Activity {
@@ -17,7 +17,7 @@ class Activity {
 }
 
 class DaySchedule {
-  String dayTitle; 
+  String dayTitle;
   List<Activity> activities;
 
   DaySchedule({required this.dayTitle, required this.activities});
@@ -28,14 +28,14 @@ class ItineraryScreen extends StatefulWidget {
   final String destination;
   final String budget;
   final String dateRange;
-  final String? aiResponse; 
+  final String? aiResponse;
 
   const ItineraryScreen({
     Key? key,
     required this.destination,
     required this.budget,
     required this.dateRange,
-    this.aiResponse, 
+    this.aiResponse,
   }) : super(key: key);
 
   @override
@@ -64,7 +64,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     _currentRawItinerary = response;
     try {
       List<DaySchedule> parsedSchedule = [];
-      
+
       // 1. Split by "Day X:"
       List<String> days = response.split(RegExp(r"Day \d+:"));
       if (days.isNotEmpty && days[0].trim().isEmpty) days.removeAt(0);
@@ -86,12 +86,13 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           String time = currentMatch.group(1) ?? "TBD";
 
           // B. Extract Content (Text between this time and the next time)
-          int start = currentMatch.end; 
+          int start = currentMatch.end;
           // Skip the dash if it exists right after the time (e.g. "09:00 AM -")
-          if (start < dayText.length && (dayText[start] == '-' || dayText[start] == '–')) {
-            start++; 
+          if (start < dayText.length &&
+              (dayText[start] == '-' || dayText[start] == '–')) {
+            start++;
           }
-          
+
           int end = (nextMatch != null) ? nextMatch.start : dayText.length;
           String fullContent = dayText.substring(start, end).trim();
 
@@ -100,11 +101,11 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
           // C. Extract Category (The fix for "General")
           String title = fullContent;
-          String category = "General"; 
+          String category = "General";
 
           // Regex: Finds text inside parentheses at the end of the string
           // e.g. "Visit Museum (Historical Site)" -> Group 1 is "Historical Site"
-          final categoryRegex = RegExp(r"\(([^)]*)\)$");
+          final categoryRegex = RegExp(r"\(([^)]+)\)$");
           final catMatch = categoryRegex.firstMatch(fullContent);
 
           if (catMatch != null) {
@@ -112,23 +113,21 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             // Remove the category from the title so it looks clean
             title = fullContent.replaceAll(categoryRegex, "").trim();
           }
-            
-          title = title.replaceAll(RegExp(r"[.,;]+$"), "");
+
           // --- 🔧 FIX: REMOVE LEADING DASHES ---
-          // This regex removes any hyphen (-) or en-dash (–) at the start, 
+          // This regex removes any hyphen (-) or en-dash (–) at the start,
           // plus any spaces immediately following it.
           title = title.replaceFirst(RegExp(r"^[-–]\s*"), "");
 
-          activities.add(Activity(
-            time: time, 
-            title: title, 
-            category: category, 
-            cost: "-"
-          ));
+          activities.add(
+            Activity(time: time, title: title, category: category, cost: "-"),
+          );
         }
-        
+
         if (activities.isNotEmpty) {
-          parsedSchedule.add(DaySchedule(dayTitle: "Day $dayCount", activities: activities));
+          parsedSchedule.add(
+            DaySchedule(dayTitle: "Day $dayCount", activities: activities),
+          );
           dayCount++;
         }
       }
@@ -136,7 +135,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
       setState(() {
         schedule = parsedSchedule;
       });
-      
     } catch (e) {
       print("Error parsing AI: $e");
       _loadDummyData();
@@ -148,8 +146,18 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
       DaySchedule(
         dayTitle: "Day 1 (Demo)",
         activities: [
-          Activity(time: "09:00 AM", title: "Georgetown Heritage Walk", category: "History", cost: "-"),
-          Activity(time: "12:00 PM", title: "Lunch at Hawker Center", category: "Food", cost: "-"),
+          Activity(
+            time: "09:00 AM",
+            title: "Georgetown Heritage Walk",
+            category: "History",
+            cost: "-",
+          ),
+          Activity(
+            time: "12:00 PM",
+            title: "Lunch at Hawker Center",
+            category: "Food",
+            cost: "-",
+          ),
         ],
       ),
     ];
@@ -163,9 +171,12 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50], 
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text("Trip Planner", style: TextStyle(color: Colors.black, fontSize: 18)),
+        title: const Text(
+          "Trip Planner",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -183,7 +194,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                   builder: (context) => EditItineraryScreen(
                     city: widget.destination,
                     // Use the current state, not just the widget's initial response
-                    originalItinerary: _convertScheduleToString(), 
+                    originalItinerary: _convertScheduleToString(),
                   ),
                 ),
               );
@@ -191,7 +202,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               // 3. Check if we got data back
               if (result != null && result is String) {
                 print("Received updated itinerary!"); // Debug print
-                
+
                 // 4. Update the UI
                 // We explicitly call your parser with the NEW string
                 _parseAiResponse(result);
@@ -216,42 +227,75 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: Colors.orange.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))]
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "Your ${widget.destination} Adventure",
-                      style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        const Icon(Icons.calendar_month, color: Colors.white70, size: 16),
+                        const Icon(
+                          Icons.calendar_month,
+                          color: Colors.white70,
+                          size: 16,
+                        ),
                         const SizedBox(width: 6),
-                        Text(widget.dateRange, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                        Text(
+                          widget.dateRange,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
                         const SizedBox(width: 20),
-                        const Icon(Icons.account_balance_wallet, color: Colors.white70, size: 16),
+                        const Icon(
+                          Icons.account_balance_wallet,
+                          color: Colors.white70,
+                          size: 16,
+                        ),
                         const SizedBox(width: 6),
-                        Text("Budget: \$${widget.budget}", style: const TextStyle(color: Colors.white, fontSize: 14)),
+                        Text(
+                          "Budget: \$${widget.budget}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 25),
 
-              if (schedule.isEmpty) 
+              if (schedule.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(20.0),
-                  child: Text("Generating your itinerary...", style: TextStyle(color: Colors.grey)),
+                  child: Text(
+                    "Generating your itinerary...",
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 )
-              else 
+              else
                 ...schedule.map((day) => _buildDayCard(day)).toList(),
-              
-              const SizedBox(height: 50), 
+
+              const SizedBox(height: 50),
             ],
           ),
         ),
@@ -267,10 +311,16 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
           child: Text(
             day.dayTitle,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
         ),
-        ...day.activities.map((activity) => _buildActivityTile(activity)).toList(),
+        ...day.activities
+            .map((activity) => _buildActivityTile(activity))
+            .toList(),
         const SizedBox(height: 10),
       ],
     );
@@ -304,13 +354,17 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              activity.time, 
-              style: TextStyle(color: Colors.orange.shade900, fontSize: 12, fontWeight: FontWeight.w700),
+              activity.time,
+              style: TextStyle(
+                color: Colors.orange.shade900,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // DETAILS
           Expanded(
             child: Column(
@@ -319,18 +373,22 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                 // TITLE (Now clean, without category)
                 Text(
                   activity.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 // CATEGORY ROW (Displays "Historical Site", "Local Cuisine", etc.)
                 Row(
                   children: [
-                    Icon(Icons.category, size: 14, color: Colors.grey[500]), 
+                    Icon(Icons.category, size: 14, color: Colors.grey[500]),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        activity.category, 
+                        activity.category,
                         style: TextStyle(color: Colors.grey[600], fontSize: 13),
                         overflow: TextOverflow.ellipsis,
                       ),
