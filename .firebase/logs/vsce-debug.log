@@ -1,1 +1,58 @@
 [debug] [2026-01-18T15:23:15.810Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2026-01-18T15:23:19.025Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2026-01-18T15:23:19.027Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-01-18T15:23:19.027Z] > authorizing via signed-in user (miliyyan56130@gmail.com)
+[debug] [2026-01-18T15:23:19.030Z] Checked if tokens are valid: true, expires at: 1768753375927
+[debug] [2026-01-18T15:23:19.030Z] Checked if tokens are valid: true, expires at: 1768753375927
+[debug] [2026-01-18T15:23:19.030Z] [Firebase Plugin] User found:  miliyyan56130@gmail.com
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2026-01-18T15:23:19.031Z] Checked if tokens are valid: true, expires at: 1768753375927
+[debug] [2026-01-18T15:23:19.032Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2026-01-18T15:23:19.040Z] [Firebase Plugin] VSCode notification server listening on port 40001
+[info] [Firebase Plugin] Starting Data Connect toolkit (version 3.0.2) on port 50001
+[info] i  dataconnect: downloading dataconnect-emulator-3.0.2.exe... {"metadata":{"emulator":{"name":"dataconnect"},"message":"downloading dataconnect-emulator-3.0.2.exe..."}}
+[debug] [2026-01-18T15:23:19.353Z] >>> [apiv2][query] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-windows-amd64-v3.0.2 
+[debug] [2026-01-18T15:23:19.721Z] <<< [apiv2][status] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-windows-amd64-v3.0.2 200
+[debug] [2026-01-18T15:23:19.721Z] <<< [apiv2][body] GET https://storage.googleapis.com/firemat-preview-drop/emulator/dataconnect-emulator-windows-amd64-v3.0.2 [stream]
+[debug] [2026-01-18T15:23:20.115Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2026-01-18T15:23:20.116Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] i  dataconnect: Removing outdated emulator files: dataconnect-emulator-3.0.0.exe {"metadata":{"emulator":{"name":"dataconnect"},"message":"Removing outdated emulator files: dataconnect-emulator-3.0.0.exe"}}
+[debug] [2026-01-18T15:23:44.704Z] I0118 23:23:44.623476   26104 control.go:100] [/emulator/roamie 4baa] UpdateResources(): done
+Main schema: sources: schema\schema.gql [906B] schema\trip.gql [97B] 
+Connector "example": sources: example\queries.gql [74B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.623476   26104 control.go:100] [/emulator/roamie 4baa] UpdateResources(): done\nMain schema: sources: schema\\schema.gql [906B] schema\\trip.gql [97B] \nConnector \"example\": sources: example\\queries.gql [74B] \n"}}
+[debug] [2026-01-18T15:23:44.705Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2026-01-18T15:23:44.706Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2026-01-18T15:23:44.706Z] Starting Data Connect Emulator with command {"binary":"C:\\Users\\chens\\.cache\\firebase\\emulators\\dataconnect-emulator-3.0.2.exe","args":["--logtostderr","-v=2","dev","--listen=localhost:50001","--config_dir=d:\\Project_AI\\RoamieRepo\\dataconnect","--enable_output_schema_extensions=true","--enable_output_generated_sdk=true"],"optionalArgs":["listen","config_dir","enable_output_schema_extensions","enable_output_generated_sdk"],"joinArgs":true,"shell":false,"port":9399} {"metadata":{"emulator":{"name":"dataconnect"},"message":"Starting Data Connect Emulator with command {\"binary\":\"C:\\\\Users\\\\chens\\\\.cache\\\\firebase\\\\emulators\\\\dataconnect-emulator-3.0.2.exe\",\"args\":[\"--logtostderr\",\"-v=2\",\"dev\",\"--listen=localhost:50001\",\"--config_dir=d:\\\\Project_AI\\\\RoamieRepo\\\\dataconnect\",\"--enable_output_schema_extensions=true\",\"--enable_output_generated_sdk=true\"],\"optionalArgs\":[\"listen\",\"config_dir\",\"enable_output_schema_extensions\",\"enable_output_generated_sdk\"],\"joinArgs\":true,\"shell\":false,\"port\":9399}"}}
+[info] i  dataconnect: Data Connect Emulator logging to dataconnect-debug.log {"metadata":{"emulator":{"name":"dataconnect"},"message":"Data Connect Emulator logging to \u001b[1mdataconnect-debug.log\u001b[22m"}}
+[debug] [2026-01-18T15:23:44.762Z] I0118 23:23:44.745223   25816 load.go:31] Reloading schema and connectors...
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.745223   25816 load.go:31] Reloading schema and connectors...\n"}}
+[debug] [2026-01-18T15:23:44.795Z] I0118 23:23:44.795432   25816 control.go:100] [/emulator/roamie 5a67] UpdateResources(): done
+Main schema: sources: schema\schema.gql [906B] schema\trip.gql [97B] 
+Connector "example": sources: example\queries.gql [74B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.795432   25816 control.go:100] [/emulator/roamie 5a67] UpdateResources(): done\nMain schema: sources: schema\\schema.gql [906B] schema\\trip.gql [97B] \nConnector \"example\": sources: example\\queries.gql [74B] \n"}}
+[debug] [2026-01-18T15:23:44.830Z] I0118 23:23:44.829622   25816 codegen.go:80] [connector "example" dartSdk] Generating sources into "d:\\Project_AI\\RoamieRepo\\roamie\\lib\\dataconnect_generated"
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.829622   25816 codegen.go:80] [connector \"example\" dartSdk] Generating sources into \"d:\\\\Project_AI\\\\RoamieRepo\\\\roamie\\\\lib\\\\dataconnect_generated\"\n"}}
+[debug] [2026-01-18T15:23:44.836Z] I0118 23:23:44.835655   25816 collector.go:107] schema extensions wrote into "d:\\Project_AI\\RoamieRepo\\dataconnect\\.dataconnect\\schema"
+Generated sources: main\mutation.gql [23459B] prelude.gql [73281B] main\implicit.gql [3213B] main\input.gql [64886B] main\relation.gql [33928B] main\query.gql [8706B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.835655   25816 collector.go:107] schema extensions wrote into \"d:\\\\Project_AI\\\\RoamieRepo\\\\dataconnect\\\\.dataconnect\\\\schema\"\nGenerated sources: main\\mutation.gql [23459B] prelude.gql [73281B] main\\implicit.gql [3213B] main\\input.gql [64886B] main\\relation.gql [33928B] main\\query.gql [8706B] \n"}}
+[debug] [2026-01-18T15:23:44.841Z] I0118 23:23:44.840775   25816 collector.go:107] connector "example" dartSdk wrote into "d:\\Project_AI\\RoamieRepo\\roamie\\lib\\dataconnect_generated"
+Generated sources: README.md [1903B] .guides/usage.md [77B] .guides/setup.md [756B] .guides/config.json [236B] get_trips.dart [2096B] generated.dart [746B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.840775   25816 collector.go:107] connector \"example\" dartSdk wrote into \"d:\\\\Project_AI\\\\RoamieRepo\\\\roamie\\\\lib\\\\dataconnect_generated\"\nGenerated sources: README.md [1903B] .guides/usage.md [77B] .guides/setup.md [756B] .guides/config.json [236B] get_trips.dart [2096B] generated.dart [746B] \n"}}
+[debug] [2026-01-18T15:23:44.843Z] I0118 23:23:44.840775   25816 load.go:109] Finished reloading
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.840775   25816 load.go:109] Finished reloading\n"}}
+[debug] [2026-01-18T15:23:44.875Z] I0118 23:23:44.874904   25816 dev.go:104] Listening on address (HTTP + gRPC): 127.0.0.1:50001
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.874904   25816 dev.go:104] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
+[debug] [2026-01-18T15:23:44.991Z] I0118 23:23:44.990831   25816 engine.go:178] [/emulator/roamie 5a67] ExecuteGraphqlRead IntrospectionQuery: succeeded. 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0118 23:23:44.990831   25816 engine.go:178] [/emulator/roamie 5a67] ExecuteGraphqlRead IntrospectionQuery: succeeded. \n"}}
+[debug] [2026-01-18T16:35:25.979Z] Object "" in "firebase.json" has unknown property: {"additionalProperty":"flutter"}
+[debug] [2026-01-18T16:35:34.858Z] E0119 00:35:34.854981   25816 watch.go:40] Failed to load config from "d:\\Project_AI\\RoamieRepo\\dataconnect": could not find dataconnect.yaml in `d:\Project_AI\RoamieRepo\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0119 00:35:34.854981   25816 watch.go:40] Failed to load config from \"d:\\\\Project_AI\\\\RoamieRepo\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Project_AI\\RoamieRepo\\dataconnect`\n"}}
+[debug] [2026-01-18T16:35:44.851Z] E0119 00:35:44.851556   25816 watch.go:40] Failed to load config from "d:\\Project_AI\\RoamieRepo\\dataconnect": could not find dataconnect.yaml in `d:\Project_AI\RoamieRepo\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0119 00:35:44.851556   25816 watch.go:40] Failed to load config from \"d:\\\\Project_AI\\\\RoamieRepo\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Project_AI\\RoamieRepo\\dataconnect`\n"}}
+[debug] [2026-01-18T16:35:54.851Z] E0119 00:35:54.851827   25816 watch.go:40] Failed to load config from "d:\\Project_AI\\RoamieRepo\\dataconnect": could not find dataconnect.yaml in `d:\Project_AI\RoamieRepo\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0119 00:35:54.851827   25816 watch.go:40] Failed to load config from \"d:\\\\Project_AI\\\\RoamieRepo\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Project_AI\\RoamieRepo\\dataconnect`\n"}}
+[debug] [2026-01-18T16:36:04.852Z] E0119 00:36:04.852276   25816 watch.go:40] Failed to load config from "d:\\Project_AI\\RoamieRepo\\dataconnect": could not find dataconnect.yaml in `d:\Project_AI\RoamieRepo\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0119 00:36:04.852276   25816 watch.go:40] Failed to load config from \"d:\\\\Project_AI\\\\RoamieRepo\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Project_AI\\RoamieRepo\\dataconnect`\n"}}
+[debug] [2026-01-18T16:36:14.894Z] E0119 00:36:14.894864   25816 watch.go:40] Failed to load config from "d:\\Project_AI\\RoamieRepo\\dataconnect": could not find dataconnect.yaml in `d:\Project_AI\RoamieRepo\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0119 00:36:14.894864   25816 watch.go:40] Failed to load config from \"d:\\\\Project_AI\\\\RoamieRepo\\\\dataconnect\": could not find dataconnect.yaml in `d:\\Project_AI\\RoamieRepo\\dataconnect`\n"}}
