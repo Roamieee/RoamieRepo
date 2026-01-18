@@ -1,13 +1,3 @@
-import java.util.Properties
-import java.io.FileInputStream
-
-// 1. THIS MUST BE AT THE TOP
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localProperties.load(FileInputStream(localPropertiesFile))
-}
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -40,11 +30,6 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        //val mapsKey = localProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
-        //manifestPlaceholders["googleMapsApiKey"] = mapsKey
-        //manifestPlaceholders["googleMapsApiKey"] = localProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
-        val mapsApiKey = localProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
-        manifestPlaceholders["googleMapsApiKey"] = mapsApiKey
     }
 
     buildTypes {

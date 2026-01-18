@@ -1,6 +1,0 @@
-query GetTrips @auth(level: PUBLIC) {
-  trips {
-    id
-    name
-  }
-}
