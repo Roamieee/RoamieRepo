@@ -113,6 +113,14 @@ class _BudgetTrackerState extends State<BudgetTracker> {
     
     if (amount <= 0) return;
 
+    // Check if adding this expense will exceed the budget
+    final newTotal = _totalSpent + amount;
+    if (newTotal > widget.totalBudget) {
+      final exceededAmount = newTotal - widget.totalBudget;
+      _showBudgetExceededAlert(amount, exceededAmount);
+      return;
+    }
+
     setState(() {
       _expenses.insert(0, {
         'id': DateTime.now().toString(), // unique ID for deletion
@@ -124,6 +132,122 @@ class _BudgetTrackerState extends State<BudgetTracker> {
       _amountController.clear();
       _descriptionController.clear();
       FocusScope.of(context).unfocus(); // Close keyboard
+    });
+  }
+
+  void _showBudgetExceededAlert(double amount, double exceededAmount) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange[700], size: 28),
+            const SizedBox(width: 10),
+            const Text('Budget Exceeded!'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adding this expense of RM${amount.toStringAsFixed(2)} will exceed your planned budget.',
+              style: const TextStyle(fontSize: 15),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.withOpacity(0.3)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Current Budget:', style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('RM${widget.totalBudget.toStringAsFixed(2)}'),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Already Spent:', style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('RM${_totalSpent.toStringAsFixed(2)}'),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Remaining:', style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('RM${_remaining.toStringAsFixed(2)}', style: const TextStyle(color: Colors.green)),
+                    ],
+                  ),
+                  const Divider(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Over Budget By:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        'RM${exceededAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Would you like to add it anyway?',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepOrange,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+              _forceAddExpense();
+            },
+            child: const Text('Add Anyway', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _forceAddExpense() {
+    final amountText = _amountController.text.trim();
+    final description = _descriptionController.text.trim();
+    final amount = double.tryParse(amountText) ?? 0;
+    
+    if (amount <= 0) return;
+
+    setState(() {
+      _expenses.insert(0, {
+        'id': DateTime.now().toString(),
+        'category': _selectedCategory,
+        'amount': amount,
+        'description': description.isEmpty ? _selectedCategory : description,
+        'timestamp': DateTime.now(),
+      });
+      _amountController.clear();
+      _descriptionController.clear();
+      FocusScope.of(context).unfocus();
     });
   }
 

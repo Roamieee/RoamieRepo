@@ -49,5 +49,9 @@
 	<string>This app needs access to speech recognition to translate your voice.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to the microphone for voice translation.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to the camera to capture text for translation.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to select images for text translation.</string>
 </dict>
 </plist>
