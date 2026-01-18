@@ -105,7 +105,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
           // Regex: Finds text inside parentheses at the end of the string
           // e.g. "Visit Museum (Historical Site)" -> Group 1 is "Historical Site"
-          final categoryRegex = RegExp(r"\(([^)]+)\)$");
+          final categoryRegex = RegExp(r"\(([^)]*)\)$");
           final catMatch = categoryRegex.firstMatch(fullContent);
 
           if (catMatch != null) {
@@ -114,10 +114,11 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             title = fullContent.replaceAll(categoryRegex, "").trim();
           }
 
+          title = title.replaceAll(RegExp(r"[.,;]+$"), "");
           // --- 🔧 FIX: REMOVE LEADING DASHES ---
           // This regex removes any hyphen (-) or en-dash (–) at the start,
           // plus any spaces immediately following it.
-          title = title.replaceFirst(RegExp(r"^[-–]\s*"), "");
+          title = title.replaceFirst(RegExp(r"^[-]\s*"), "");
 
           activities.add(
             Activity(time: time, title: title, category: category, cost: "-"),
