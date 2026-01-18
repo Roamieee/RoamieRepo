@@ -1,0 +1,664 @@
+extend type Mutation {
+  """
+  ✨ Insert a single `Movie` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  movie_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Movie_Data!
+  ): Movie_KeyOutput! @fdc_generated(from: "Movie", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `MovieList` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  movieList_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: MovieList_Data!
+  ): MovieList_KeyOutput! @fdc_generated(from: "MovieList", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `MovieListItem` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  movieListItem_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: MovieListItem_Data!
+  ): MovieListItem_KeyOutput! @fdc_generated(from: "MovieListItem", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Review` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  review_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Review_Data!
+  ): Review_KeyOutput! @fdc_generated(from: "Review", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `User` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Watch` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  watch_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Watch_Data!
+  ): Watch_KeyOutput! @fdc_generated(from: "Watch", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert `Movie` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  movie_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Movie_Data!]!
+  ): [Movie_KeyOutput!]! @fdc_generated(from: "Movie", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `MovieList` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  movieList_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [MovieList_Data!]!
+  ): [MovieList_KeyOutput!]! @fdc_generated(from: "MovieList", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `MovieListItem` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  movieListItem_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [MovieListItem_Data!]!
+  ): [MovieListItem_KeyOutput!]! @fdc_generated(from: "MovieListItem", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Review` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  review_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Review_Data!]!
+  ): [Review_KeyOutput!]! @fdc_generated(from: "Review", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `User` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Watch` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  watch_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Watch_Data!]!
+  ): [Watch_KeyOutput!]! @fdc_generated(from: "Watch", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert or update a single `Movie` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Movie`.
+  """
+  movie_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Movie_Data!
+  ): Movie_KeyOutput! @fdc_generated(from: "Movie", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `MovieList` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `MovieList`.
+  """
+  movieList_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: MovieList_Data!
+  ): MovieList_KeyOutput! @fdc_generated(from: "MovieList", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `MovieListItem` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `MovieListItem`.
+  """
+  movieListItem_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: MovieListItem_Data!
+  ): MovieListItem_KeyOutput! @fdc_generated(from: "MovieListItem", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Review` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Review`.
+  """
+  review_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Review_Data!
+  ): Review_KeyOutput! @fdc_generated(from: "Review", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `User` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Watch` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Watch`.
+  """
+  watch_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Watch_Data!
+  ): Watch_KeyOutput! @fdc_generated(from: "Watch", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update `Movie` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Movie`.
+  """
+  movie_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Movie_Data!]!
+  ): [Movie_KeyOutput!]! @fdc_generated(from: "Movie", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `MovieList` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `MovieList`.
+  """
+  movieList_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [MovieList_Data!]!
+  ): [MovieList_KeyOutput!]! @fdc_generated(from: "MovieList", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `MovieListItem` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `MovieListItem`.
+  """
+  movieListItem_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [MovieListItem_Data!]!
+  ): [MovieListItem_KeyOutput!]! @fdc_generated(from: "MovieListItem", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Review` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Review`.
+  """
+  review_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Review_Data!]!
+  ): [Review_KeyOutput!]! @fdc_generated(from: "Review", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `User` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Watch` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Watch`.
+  """
+  watch_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Watch_Data!]!
+  ): [Watch_KeyOutput!]! @fdc_generated(from: "Watch", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Update a single `Movie` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Movie` or `null` if not found.
+  """
+  movie_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Movie_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Movie_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Movie_Data!
+  ): Movie_KeyOutput @fdc_generated(from: "Movie", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `MovieList` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `MovieList` or `null` if not found.
+  """
+  movieList_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: MovieList_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: MovieList_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: MovieList_Data!
+  ): MovieList_KeyOutput @fdc_generated(from: "MovieList", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `MovieListItem` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `MovieListItem` or `null` if not found.
+  """
+  movieListItem_update(
+    """
+    The key used to identify the object.
+    """
+    key: MovieListItem_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: MovieListItem_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: MovieListItem_Data!
+  ): MovieListItem_KeyOutput @fdc_generated(from: "MovieListItem", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Review` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Review` or `null` if not found.
+  """
+  review_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Review_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Review_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Review_Data!
+  ): Review_KeyOutput @fdc_generated(from: "Review", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `User` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `User` or `null` if not found.
+  """
+  user_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: User_Data!
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Watch` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Watch` or `null` if not found.
+  """
+  watch_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Watch_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Watch_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Watch_Data!
+  ): Watch_KeyOutput @fdc_generated(from: "Watch", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update `Movie` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  movie_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Movie_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Movie_Data!
+  ): Int! @fdc_generated(from: "Movie", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `MovieList` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  movieList_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: MovieList_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: MovieList_Data!
+  ): Int! @fdc_generated(from: "MovieList", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `MovieListItem` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  movieListItem_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: MovieListItem_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: MovieListItem_Data!
+  ): Int! @fdc_generated(from: "MovieListItem", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Review` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  review_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Review_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Review_Data!
+  ): Int! @fdc_generated(from: "Review", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `User` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  user_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: User_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: User_Data!
+  ): Int! @fdc_generated(from: "User", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Watch` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  watch_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Watch_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Watch_Data!
+  ): Int! @fdc_generated(from: "Watch", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Delete a single `Movie` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  movie_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Movie_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Movie_FirstRow
+  ): Movie_KeyOutput @fdc_generated(from: "Movie", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `MovieList` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  movieList_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: MovieList_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: MovieList_FirstRow
+  ): MovieList_KeyOutput @fdc_generated(from: "MovieList", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `MovieListItem` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  movieListItem_delete(
+    """
+    The key used to identify the object.
+    """
+    key: MovieListItem_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: MovieListItem_FirstRow
+  ): MovieListItem_KeyOutput @fdc_generated(from: "MovieListItem", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Review` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  review_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Review_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Review_FirstRow
+  ): Review_KeyOutput @fdc_generated(from: "Review", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `User` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  user_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Watch` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  watch_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Watch_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Watch_FirstRow
+  ): Watch_KeyOutput @fdc_generated(from: "Watch", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete `Movie` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  movie_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Movie_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Movie", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `MovieList` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  movieList_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: MovieList_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "MovieList", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `MovieListItem` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  movieListItem_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: MovieListItem_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "MovieListItem", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Review` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  review_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Review_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Review", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `User` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  user_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: User_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "User", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Watch` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  watch_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Watch_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Watch", purpose: DELETE_MULTIPLE)
+}
