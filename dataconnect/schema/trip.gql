@@ -1,0 +1,6 @@
+type Trip @table {
+  id: UUID!
+  name: String!
+  startDate: Date!
+  destination: String!
+}
