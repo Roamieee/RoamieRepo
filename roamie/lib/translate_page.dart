@@ -123,7 +123,7 @@ class _TranslationToolState extends State<TranslationTool> {
 
       print('TTS: Speaking "$_translatedText"');
       var result = await _flutterTts.speak(_translatedText);
-      
+
       if (result == 1) {
         print("TTS: Speak command accepted");
       } else {
@@ -662,8 +662,6 @@ class _TranslationToolState extends State<TranslationTool> {
     // Automatically trigger translation when a quick phrase is tapped
     _handleTranslate();
   }
-
-
 }
 
 class _QuickPhraseButton extends StatelessWidget {
