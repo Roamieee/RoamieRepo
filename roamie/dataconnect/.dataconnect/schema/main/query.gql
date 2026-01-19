@@ -1,0 +1,315 @@
+extend type Query {
+  """
+  ✨ Look up a single `Movie` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  movie(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Movie_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Movie_FirstRow
+  ): Movie @fdc_generated(from: "Movie", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `MovieList` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  movieList(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: MovieList_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: MovieList_FirstRow
+  ): MovieList @fdc_generated(from: "MovieList", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `MovieListItem` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  movieListItem(
+    """
+    The key used to identify the object.
+    """
+    key: MovieListItem_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: MovieListItem_FirstRow
+  ): MovieListItem @fdc_generated(from: "MovieListItem", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `Review` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  review(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Review_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Review_FirstRow
+  ): Review @fdc_generated(from: "Review", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `User` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  user(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+  ): User @fdc_generated(from: "User", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `Watch` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  watch(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Watch_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Watch_FirstRow
+  ): Watch @fdc_generated(from: "Watch", purpose: QUERY_SINGLE)
+  """
+  ✨ List `Movie` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  movies(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: Movie_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [Movie_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: Movie_Having
+  ): [Movie!]! @fdc_generated(from: "Movie", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `MovieList` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  movieLists(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: MovieList_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [MovieList_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: MovieList_Having
+  ): [MovieList!]! @fdc_generated(from: "MovieList", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `MovieListItem` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  movieListItems(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: MovieListItem_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [MovieListItem_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: MovieListItem_Having
+  ): [MovieListItem!]! @fdc_generated(from: "MovieListItem", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `Review` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  reviews(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: Review_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [Review_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: Review_Having
+  ): [Review!]! @fdc_generated(from: "Review", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `User` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  users(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: User_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [User_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: User_Having
+  ): [User!]! @fdc_generated(from: "User", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `Watch` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  watches(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: Watch_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [Watch_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: Watch_Having
+  ): [Watch!]! @fdc_generated(from: "Watch", purpose: QUERY_MULTIPLE)
+}

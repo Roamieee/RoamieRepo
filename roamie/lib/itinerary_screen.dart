@@ -105,13 +105,50 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
           // Regex: Finds text inside parentheses at the end of the string
           // e.g. "Visit Museum (Historical Site)" -> Group 1 is "Historical Site"
-          final categoryRegex = RegExp(r"\(([^)]*)\)$");
+          final categoryRegex = RegExp(r"\(([^)]+)\)$");
           final catMatch = categoryRegex.firstMatch(fullContent);
 
           if (catMatch != null) {
             category = catMatch.group(1)?.trim() ?? "General";
             // Remove the category from the title so it looks clean
             title = fullContent.replaceAll(categoryRegex, "").trim();
+          } else {
+            // 2. FALLBACK: Smart Category Detection (If AI forgets parentheses)
+            String lower = fullContent.toLowerCase();
+            if (lower.contains("fort") ||
+                lower.contains("museum") ||
+                lower.contains("temple") ||
+                lower.contains("historic") ||
+                lower.contains("church")) {
+              category = "Historical Sites";
+            } else if (lower.contains("market") ||
+                lower.contains("mall") ||
+                lower.contains("shop") ||
+                lower.contains("store")) {
+              category = "Shopping";
+            } else if (lower.contains("beach") ||
+                lower.contains("park") ||
+                lower.contains("garden") ||
+                lower.contains("nature")) {
+              category = "Nature";
+            } else if (lower.contains("eat") ||
+                lower.contains("lunch") ||
+                lower.contains("dinner") ||
+                lower.contains("food") ||
+                lower.contains("cafe")) {
+              category = "Local Cuisine";
+            } else if (lower.contains("hotel") ||
+                lower.contains("check in") ||
+                lower.contains("arrive") ||
+                lower.contains("airport")) {
+              category = "Logistics";
+            }
+          }
+
+          // 3. Clean the Title (Fix for verbose/long AI text)
+          // If the title is a long paragraph, take only the first sentence.
+          if (title.length > 50 && title.contains(".")) {
+            title = title.substring(0, title.indexOf("."));
           }
 
           title = title.replaceAll(RegExp(r"[.,;]+$"), "");
